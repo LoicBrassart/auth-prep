@@ -39,11 +39,17 @@ export type Category = {
 export type Mutation = {
   __typename?: 'Mutation';
   createNewAd: Ad;
+  createUser: Scalars['String']['output'];
 };
 
 
 export type MutationCreateNewAdArgs = {
   data: NewAdInput;
+};
+
+
+export type MutationCreateUserArgs = {
+  data: NewUserInput;
 };
 
 export type NewAdInput = {
@@ -57,17 +63,28 @@ export type NewAdInput = {
   ville: Scalars['String']['input'];
 };
 
+export type NewUserInput = {
+  mail: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   getAdById: Ad;
   getAllAds: Array<Ad>;
   getAllCategories: Array<Category>;
   getAllTags: Array<Tag>;
+  login: Scalars['String']['output'];
 };
 
 
 export type QueryGetAdByIdArgs = {
   adId: Scalars['String']['input'];
+};
+
+
+export type QueryLoginArgs = {
+  data: NewUserInput;
 };
 
 export type Tag = {
