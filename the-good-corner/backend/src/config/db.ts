@@ -3,6 +3,7 @@ import { Ad } from "../entities/ad";
 import { DataSource } from "typeorm";
 import { Tag } from "../entities/tag";
 import * as dotenv from "dotenv";
+import { User } from "../entities/user";
 
 dotenv.config();
 
@@ -15,5 +16,5 @@ export const dataSource = new DataSource({
   database: process.env.POSTGRES_DB,
   synchronize: true,
   logging: ["error", "query"],
-  entities: [Ad, Category, Tag],
+  entities: [Ad, Category, Tag, User],
 });
