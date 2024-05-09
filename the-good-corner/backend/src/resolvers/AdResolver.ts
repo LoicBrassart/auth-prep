@@ -2,6 +2,8 @@ import { Category } from "../entities/category";
 import { Ad } from "../entities/ad";
 import {
   Arg,
+  Authorized,
+  Ctx,
   Field,
   ID,
   InputType,
@@ -52,9 +54,10 @@ class AdResolver {
     return ad;
   }
 
+  @Authorized("ADMIN", "MODERATOR")
   @Mutation(() => Ad)
-  async createNewAd(@Arg("data") newAdData: NewAdInput) {
-    console.log("new ad data", newAdData);
+  async createNewAd(@Arg("data") newAdData: NewAdInput, @Ctx() ctx: any) {
+    console.log(ctx.user); //Allows for example to save new content's author
     const resultFromSave = await Ad.save({ ...newAdData });
     const resultForApi = await Ad.find({
       relations: { category: true },

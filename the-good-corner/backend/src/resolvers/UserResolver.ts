@@ -1,6 +1,7 @@
 import * as argon2 from "argon2";
+import * as jwt from "jsonwebtoken";
 import { User } from "../entities/user";
-import { Arg, Field, InputType, Mutation, Resolver } from "type-graphql";
+import { Arg, Field, InputType, Mutation, Query, Resolver } from "type-graphql";
 
 @InputType()
 class NewUserInput implements Partial<User> {
@@ -22,6 +23,31 @@ class UserResolver {
       hashedPassword,
     });
     return "User created";
+  }
+
+  @Query(() => String)
+  async login(@Arg("data") userData: NewUserInput) {
+    try {
+      if (!process.env.JWT_SECRET) throw new Error();
+      const user = await User.findOneByOrFail({ mail: userData.mail });
+      const isValid = await argon2.verify(
+        user.hashedPassword,
+        userData.password
+      );
+      if (!isValid) throw new Error();
+
+      const token = jwt.sign({ mail: user.mail }, process.env.JWT_SECRET);
+      return token;
+      return {
+        token,
+        user: {
+          // Public data used to customize front app
+          mail: user.mail,
+        },
+      };
+    } catch (err) {
+      throw new Error("Login error");
+    }
   }
 }
 
