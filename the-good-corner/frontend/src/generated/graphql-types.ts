@@ -23,7 +23,7 @@ export type Ad = {
   description: Scalars['String']['output'];
   id: Scalars['Float']['output'];
   imgUrl: Scalars['String']['output'];
-  owner: Scalars['String']['output'];
+  owner: User;
   price: Scalars['Float']['output'];
   title: Scalars['String']['output'];
   ville: Scalars['String']['output'];
@@ -39,6 +39,8 @@ export type Category = {
 export type Mutation = {
   __typename?: 'Mutation';
   createNewAd: Ad;
+  createUser: Scalars['String']['output'];
+  deleteAd: Ad;
 };
 
 
@@ -46,15 +48,29 @@ export type MutationCreateNewAdArgs = {
   data: NewAdInput;
 };
 
+
+export type MutationCreateUserArgs = {
+  data: NewUserInput;
+};
+
+
+export type MutationDeleteAdArgs = {
+  adId: Scalars['Float']['input'];
+};
+
 export type NewAdInput = {
   category: Scalars['ID']['input'];
   description: Scalars['String']['input'];
   imgUrl?: InputMaybe<Scalars['String']['input']>;
-  owner: Scalars['String']['input'];
   price: Scalars['Float']['input'];
   tags: Array<Scalars['ID']['input']>;
   title: Scalars['String']['input'];
   ville: Scalars['String']['input'];
+};
+
+export type NewUserInput = {
+  mail: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 };
 
 export type Query = {
@@ -63,6 +79,7 @@ export type Query = {
   getAllAds: Array<Ad>;
   getAllCategories: Array<Category>;
   getAllTags: Array<Tag>;
+  login: Scalars['String']['output'];
 };
 
 
@@ -70,10 +87,22 @@ export type QueryGetAdByIdArgs = {
   adId: Scalars['String']['input'];
 };
 
+
+export type QueryLoginArgs = {
+  data: NewUserInput;
+};
+
 export type Tag = {
   __typename?: 'Tag';
   id: Scalars['Float']['output'];
   name: Scalars['String']['output'];
+};
+
+export type User = {
+  __typename?: 'User';
+  ads: Array<Ad>;
+  mail: Scalars['String']['output'];
+  roles: Scalars['String']['output'];
 };
 
 export type GetAllCategoriesAndTagsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -86,7 +115,7 @@ export type GetAdByIdQueryVariables = Exact<{
 }>;
 
 
-export type GetAdByIdQuery = { __typename?: 'Query', getAdById: { __typename?: 'Ad', id: number, title: string, description: string, owner: string, ville: string, imgUrl: string, price: number } };
+export type GetAdByIdQuery = { __typename?: 'Query', getAdById: { __typename?: 'Ad', id: number, title: string, description: string, ville: string, imgUrl: string, price: number, owner: { __typename?: 'User', mail: string } } };
 
 
 export const GetAllCategoriesAndTagsDocument = gql`
@@ -139,7 +168,9 @@ export const GetAdByIdDocument = gql`
     id
     title
     description
-    owner
+    owner {
+      mail
+    }
     ville
     imgUrl
     price

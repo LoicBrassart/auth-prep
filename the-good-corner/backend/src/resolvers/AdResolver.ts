@@ -1,7 +1,8 @@
 import { Category } from "../entities/category";
-import { Ad } from "../entities/ad";
 import {
   Arg,
+  Authorized,
+  Ctx,
   Field,
   ID,
   InputType,
@@ -9,7 +10,10 @@ import {
   Query,
   Resolver,
 } from "type-graphql";
-import { Tag } from "src/entities/tag";
+import { Ad } from "../entities/ad";
+import { Tag } from "../entities/tag";
+import { User } from "../entities/user";
+import { commonElts } from "../helpers/array";
 
 @InputType()
 class NewAdInput implements Partial<Ad> {
@@ -18,9 +22,6 @@ class NewAdInput implements Partial<Ad> {
 
   @Field()
   description: string;
-
-  @Field()
-  owner: string;
 
   @Field()
   price: number;
@@ -52,15 +53,35 @@ class AdResolver {
     return ad;
   }
 
+  @Authorized("USER")
   @Mutation(() => Ad)
-  async createNewAd(@Arg("data") newAdData: NewAdInput) {
-    console.log("new ad data", newAdData);
-    const resultFromSave = await Ad.save({ ...newAdData });
+  async createNewAd(@Arg("data") newAdData: NewAdInput, @Ctx() ctx: any) {
+    console.log("createNewAd:context", ctx);
+
+    const owner = await User.findOneByOrFail({ id: ctx.id });
+
+    const resultFromSave = await Ad.save({ ...newAdData, owner });
     const resultForApi = await Ad.find({
       relations: { category: true },
       where: { id: resultFromSave.id },
     });
     return resultForApi[0];
+  }
+
+  @Authorized("USER, MODERATOR")
+  @Mutation(() => Ad)
+  async deleteAd(@Arg("adId") adId: number, @Ctx() ctx: any) {
+    const owner = await User.findOneByOrFail({ id: ctx.id });
+    const ad = await Ad.findOneByOrFail({ id: adId });
+    if (
+      owner.id !== ad.owner.id &&
+      !commonElts(ctx.roles, ["MODERATOR", "ADMIN"]).length
+    ) {
+      return new Error("Not authorized");
+    }
+
+    ad.remove();
+    return "Deleted ad";
   }
 }
 

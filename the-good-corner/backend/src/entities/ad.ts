@@ -7,10 +7,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Category } from "./category";
-import { Tag } from "./tag";
 import { Length } from "class-validator";
 import { Field, ObjectType } from "type-graphql";
+import { Category } from "./category";
+import { Tag } from "./tag";
+import { User } from "./user";
 
 @ObjectType()
 @Entity()
@@ -27,10 +28,6 @@ export class Ad extends BaseEntity {
   @Field()
   @Column()
   description: string;
-
-  @Field()
-  @Column()
-  owner: string;
 
   @Field()
   @Column()
@@ -54,4 +51,8 @@ export class Ad extends BaseEntity {
   @ManyToMany(() => Tag)
   @JoinTable()
   tags: Tag[];
+
+  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.ads)
+  owner: User;
 }
