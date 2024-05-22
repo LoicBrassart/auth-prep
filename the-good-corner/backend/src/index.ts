@@ -14,13 +14,17 @@ const start = async () => {
   const schema = await buildSchema({
     resolvers: [AdResolver, CategoryResolver, TagResolver, UserResolver],
     authChecker: ({ context }, neededRoles) => {
+      console.log("authChecker:context", context);
       if (!context.mail) return false;
 
       //Insert logic here
-      const validRoles = neededRoles.filter((elt) =>
-        context.roles.includes(elt)
-      );
+      // ADMIN can access any route
+      if (context.roles.includes("ADMIN")) return true;
 
+      // Check user's roles against route's requirements
+      const validRoles = neededRoles.filter((elt) =>
+        context.roles.split("|").includes(elt)
+      );
       return validRoles.length > 0;
     },
   });

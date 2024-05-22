@@ -21,6 +21,7 @@ class UserResolver {
     await User.save({
       mail: userData.mail,
       hashedPassword,
+      roles: "USER",
     });
     return "User created";
   }
@@ -36,7 +37,10 @@ class UserResolver {
       );
       if (!isValid) throw new Error();
 
-      const token = jwt.sign({ mail: user.mail }, process.env.JWT_SECRET);
+      const token = jwt.sign(
+        { mail: user.mail, roles: user.roles, id: user.id },
+        process.env.JWT_SECRET
+      );
       return token;
       return {
         token,
