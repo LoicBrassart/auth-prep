@@ -43,7 +43,7 @@ class NewAdInput implements Partial<Ad> {
 class AdResolver {
   @Query(() => [Ad])
   async getAllAds() {
-    const ads = await Ad.find({ relations: { category: true } });
+    const ads = await Ad.find({ relations: { category: true, owner: true } });
     return ads;
   }
 
