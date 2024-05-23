@@ -9,7 +9,10 @@ export const GET_ALL_ADS = gql`
       id
       title
       description
-      owner
+      owner {
+        id
+        mail
+      }
       ville
       imgUrl
     }

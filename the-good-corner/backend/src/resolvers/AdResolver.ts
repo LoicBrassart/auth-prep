@@ -49,7 +49,10 @@ class AdResolver {
 
   @Query(() => Ad)
   async getAdById(@Arg("adId") adId: string) {
-    const ad = await Ad.findOneByOrFail({ id: Number.parseInt(adId) });
+    const ad = await Ad.findOne({
+      relations: { category: true, owner: true },
+      where: { id: Number.parseInt(adId) },
+    });
     return ad;
   }
 
@@ -62,7 +65,7 @@ class AdResolver {
 
     const resultFromSave = await Ad.save({ ...newAdData, owner });
     const resultForApi = await Ad.find({
-      relations: { category: true },
+      relations: { category: true, owner: true },
       where: { id: resultFromSave.id },
     });
     return resultForApi[0];

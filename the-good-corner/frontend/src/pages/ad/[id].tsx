@@ -1,16 +1,12 @@
-import { AdCardProps } from "@/components/AdCard";
 import { useGetAdByIdQuery } from "@/generated/graphql-types";
-import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 
 const AdDetails = () => {
   const router = useRouter();
   const { data, loading, error } = useGetAdByIdQuery({
     variables: { adId: router.query.id as string },
   });
-  console.log("data");
   if (loading) {
     return <p>Loading</p>;
   }
@@ -33,7 +29,7 @@ const AdDetails = () => {
             </div>
             <hr className="separator" />
             <div className="ad-details-owner">
-              Annoncée publiée par <b>{data?.getAdById.owner}</b>
+              Annoncée publiée par <b>{data?.getAdById.owner.mail}</b>
             </div>
             <a
               href="mailto:serge@serge.com"
